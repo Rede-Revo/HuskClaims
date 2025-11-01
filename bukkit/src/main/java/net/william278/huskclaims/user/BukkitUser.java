@@ -41,11 +41,25 @@ import java.util.Optional;
 @Getter
 public class BukkitUser extends OnlineUser {
 
-    private final Player bukkitPlayer;
+    private Player bukkitPlayer;
 
     private BukkitUser(@NotNull Player bukkitPlayer, @NotNull HuskClaims plugin) {
         super(bukkitPlayer.getName(), bukkitPlayer.getUniqueId(), plugin);
         this.bukkitPlayer = bukkitPlayer;
+    }
+
+    /**
+     * Updates the internal Player reference. This is used to refresh the reference
+     * when a player reconnects and the cached BukkitUser object is reused.
+     *
+     * @param player The new Player instance
+     */
+    @ApiStatus.Internal
+    void updatePlayerReference(@NotNull Player player) {
+        if (!player.getUniqueId().equals(this.getUuid())) {
+            throw new IllegalArgumentException("Cannot update player reference with different UUID");
+        }
+        this.bukkitPlayer = player;
     }
 
     @NotNull
