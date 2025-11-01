@@ -337,6 +337,18 @@ public class ClaimWorld {
     }
 
     /**
+     * Get a claim by its ID
+     *
+     * @param id The UUID of the claim
+     * @return an optional containing the claim if found
+     */
+    public Optional<Claim> getClaimById(@NotNull UUID id) {
+        return getClaims().stream()
+                .filter(claim -> claim.getId() != null && claim.getId().equals(id))
+                .findFirst();
+    }
+
+    /**
      * Get all claims in this world
      *
      * @return a set of all claims in this world

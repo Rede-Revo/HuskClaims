@@ -19,6 +19,7 @@
 
 package net.william278.huskclaims.claim;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -56,6 +57,11 @@ import java.util.concurrent.ConcurrentMap;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Claim implements Highlightable {
+
+    @Expose
+    @Getter
+    private UUID id;
+
 
     /**
      * The claim region
@@ -159,10 +165,11 @@ public class Claim implements Highlightable {
     @SerializedName("creation_time")
     private String creationTime;
 
-    protected Claim(@Nullable UUID owner, @NotNull Region region, @NotNull ConcurrentMap<UUID, String> users,
+    protected Claim(@NotNull UUID id, @Nullable UUID owner, @NotNull Region region, @NotNull ConcurrentMap<UUID, String> users,
                     @NotNull ConcurrentMap<String, String> groups, @NotNull ConcurrentMap<String, String> tags,
                     @NotNull ConcurrentMap<UUID, UUID> bannedUsers, @NotNull Set<Claim> children, boolean inheritParent,
                     @NotNull Set<OperationType> defaultFlags, boolean privateClaim) {
+        this.id = id;
         this.owner = owner;
         this.region = region;
         this.trustedUsers = users;
@@ -177,31 +184,31 @@ public class Claim implements Highlightable {
         children.forEach(child -> child.setParent(this));
     }
 
-    private Claim(@Nullable UUID owner, @NotNull Region region, @NotNull HuskClaims plugin) {
+    private Claim(@NotNull UUID id, @Nullable UUID owner, @NotNull Region region, @NotNull HuskClaims plugin) {
         this(
-                owner, region,
+                id, owner, region,
                 Maps.newConcurrentMap(), Maps.newConcurrentMap(), Maps.newConcurrentMap(),
                 Maps.newConcurrentMap(), Sets.newConcurrentHashSet(), true,
                 Sets.newConcurrentHashSet(owner != null
                         ? plugin.getSettings().getClaims().getDefaultFlags()
-                        : plugin.getSettings().getClaims().getAdminFlags()), 
-                        false
+                        : plugin.getSettings().getClaims().getAdminFlags()),
+                false
         );
     }
 
     @NotNull
     public static Claim create(@NotNull User owner, @NotNull Region region, @NotNull HuskClaims plugin) {
-        return new Claim(owner.getUuid(), region, plugin);
+        return new Claim(UuidCreator.getTimeOrderedEpoch(), owner.getUuid(), region, plugin);
     }
 
     @NotNull
     public static Claim create(@Nullable UUID owner, @NotNull Region region, @NotNull HuskClaims plugin) {
-        return new Claim(owner, region, plugin);
+        return new Claim(UuidCreator.getTimeOrderedEpoch(), owner, region, plugin);
     }
 
     @NotNull
     public static Claim createAdminClaim(@NotNull Region region, @NotNull HuskClaims plugin) {
-        return new Claim(null, region, plugin);
+        return new Claim(UuidCreator.getTimeOrderedEpoch(), null, region, plugin);
     }
 
     /**
@@ -605,7 +612,7 @@ public class Claim implements Highlightable {
         return getOwner()
                 // Get the owner username from the cache
                 .map(owner -> world.getUser(owner).map(User::getName)
-                        .orElse(plugin.getLocales().getNotApplicable()))
+                        .orElse(plugin.getPlayerName(owner).orElse(plugin.getLocales().getNotApplicable())))
                 // Or, if it's an admin claim, get the admin username
                 .orElse(plugin.getLocales().getRawLocale("administrator_username")
                         .orElse(plugin.getLocales().getNotApplicable()));
@@ -621,7 +628,7 @@ public class Claim implements Highlightable {
         if (!region.fullyEncloses(subRegion)) {
             throw new IllegalArgumentException("Child claim must be fully enclosed within parent claim");
         }
-        final Claim child = new Claim(owner, subRegion, plugin);
+        final Claim child = new Claim(UuidCreator.getTimeOrderedEpoch(), owner, subRegion, plugin);
         children.add(child);
         child.setParent(this);
         return child;

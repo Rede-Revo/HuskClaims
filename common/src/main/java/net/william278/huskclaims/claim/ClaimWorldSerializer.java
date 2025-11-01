@@ -19,6 +19,7 @@
 
 package net.william278.huskclaims.claim;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;
@@ -114,7 +115,10 @@ public class ClaimWorldSerializer implements JsonSerializer<ClaimWorld>, JsonDes
         final Set<OperationType> defaultFlags = gson.fromJson(co.getAsJsonArray("default_flags"),
                 GsonProvider.OPERATION_TYPE_SET_TOKEN);
         final boolean inheritParent = co.get("inherit_parent").getAsBoolean();
-        return new Claim(owner, region, trustedUsers, trustedGroups, trustedTags, Maps.newConcurrentMap(), children,
+
+        final UUID id = co.has("id") ? UUID.fromString(co.get("id").getAsString()) : UuidCreator.getTimeOrderedEpoch();
+
+        return new Claim(id, owner, region, trustedUsers, trustedGroups, trustedTags, Maps.newConcurrentMap(), children,
                 inheritParent, defaultFlags, false);
     }
 

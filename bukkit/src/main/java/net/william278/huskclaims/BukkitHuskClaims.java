@@ -19,6 +19,8 @@
 
 package net.william278.huskclaims;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -73,8 +75,7 @@ import space.arim.morepaperlib.MorePaperLib;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 @NoArgsConstructor
@@ -307,6 +308,27 @@ public class BukkitHuskClaims extends JavaPlugin implements HuskClaims, BukkitTa
     @NotNull
     public BukkitHuskClaims getPlugin() {
         return this;
+    }
+
+    private static final Cache<UUID, CompletableFuture<String>> PLAYER_CACHE =
+            CacheBuilder.newBuilder()
+                    .expireAfterAccess(6, TimeUnit.HOURS)
+                    .build();
+
+    @Override
+    public Optional<String> getPlayerName(UUID id) {
+        try {
+            CompletableFuture<String> nameFuture = PLAYER_CACHE.get(id, () ->
+                    CompletableFuture.supplyAsync(() -> Bukkit.getOfflinePlayer(id).getName())
+            );
+
+            return nameFuture.isDone()
+                    ? Optional.ofNullable(nameFuture.join())
+                    : Optional.empty();
+
+        } catch (ExecutionException e) {
+            return Optional.empty();
+        }
     }
 
     public static class Adapter {
