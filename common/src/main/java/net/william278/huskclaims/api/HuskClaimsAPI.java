@@ -483,6 +483,10 @@ public class HuskClaimsAPI {
         return plugin.getClaimWorld(position.getWorld()).flatMap(claimWorld -> claimWorld.getParentClaimAt(position));
     }
 
+    public Optional<Claim> getClaimById(@NotNull World world, @NotNull UUID id) {
+        return plugin.getClaimWorld(world).flatMap(claimWorld -> claimWorld.getClaimById(id));
+    }
+
     /**
      * Get a list of parent claims overlapping a {@link Region} in a {@link ClaimWorld}.
      *

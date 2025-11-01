@@ -43,6 +43,8 @@ shadowJar {
     relocate 'me.lucko', 'net.william278.huskclaims.libraries'
     relocate 'net.roxeez', 'net.william278.huskclaims.libraries'
 
+    relocate 'com.github.f4b6a3.uuid', 'net.william278.huskclaims.libraries'
+
     minimize()
 }
 

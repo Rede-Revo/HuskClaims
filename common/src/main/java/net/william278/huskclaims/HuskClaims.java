@@ -42,6 +42,8 @@ import net.william278.huskclaims.util.*;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /**
@@ -185,5 +187,7 @@ public interface HuskClaims extends Task.Supplier, ConfigProvider, UserProvider,
     default HuskClaims getPlugin() {
         return this;
     }
+
+    Optional<String> getPlayerName(UUID id);
 
 }
