@@ -45,6 +45,7 @@ public interface BukkitUserProvider extends UserProvider {
             getOnlineUserMap().put(player.getUniqueId(), user);
             return user;
         }
+        user.updatePlayerReference(player);
         return user;
     }
 
