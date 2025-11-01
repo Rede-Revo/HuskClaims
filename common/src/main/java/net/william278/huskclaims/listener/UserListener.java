@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface UserListener {
 
+    String ENTER_BYPASS_PERMISSION = "huskclaims.enter.bypass";
+
     default void onUserJoin(@NotNull OnlineUser user) {
         getPlugin().runAsync(() -> {
             getPlugin().cacheSavedUser(user);
@@ -102,6 +104,9 @@ public interface UserListener {
 
     // Check a user is able to enter a claim on join (that they are not banned / the claim has been made private)
     private void checkClaimEnterOnLogin(@NotNull OnlineUser u) {
+        if (u.hasPermission(ENTER_BYPASS_PERMISSION)) {
+            return;
+        }
         getPlugin().getClaimWorld(u.getWorld()).ifPresent(w -> w.getClaimAt(u.getPosition()).ifPresent(c -> {
             if (w.isBannedFromClaim(u, c, getPlugin()) || w.cannotNavigatePrivateClaim(u, c, getPlugin())) {
                 getPlugin().teleportOutOfClaim(u, true);

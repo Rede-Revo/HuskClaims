@@ -31,6 +31,7 @@ import lombok.Setter;
 import net.william278.cloplib.operation.Operation;
 import net.william278.cloplib.operation.OperationType;
 import net.william278.huskclaims.HuskClaims;
+import net.william278.huskclaims.listener.UserListener;
 import net.william278.huskclaims.position.BlockPosition;
 import net.william278.huskclaims.position.Position;
 import net.william278.huskclaims.user.OnlineUser;
@@ -473,6 +474,10 @@ public class ClaimWorld {
     // Check if a user is banned from a claim
     @ApiStatus.Internal
     public boolean isBannedFromClaim(@NotNull OnlineUser user, @NotNull Claim claim, @NotNull HuskClaims plugin) {
+        if (user.hasPermission(UserListener.ENTER_BYPASS_PERMISSION)) {
+            return false;
+        }
+
         if (!plugin.getSettings().getClaims().getBans().isEnabled() || plugin.isIgnoringClaims(user)) {
             return false;
         }
@@ -489,6 +494,10 @@ public class ClaimWorld {
     @ApiStatus.Internal
     public boolean cannotNavigatePrivateClaim(@NotNull OnlineUser user, @NotNull Claim claim,
                                               @NotNull HuskClaims plugin) {
+        if (user.hasPermission(UserListener.ENTER_BYPASS_PERMISSION)) {
+            return false;
+        }
+
         if (!plugin.getSettings().getClaims().getBans().isPrivateClaims() || plugin.isIgnoringClaims(user)) {
             return false;
         }
