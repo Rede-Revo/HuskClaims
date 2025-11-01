@@ -238,7 +238,8 @@ public interface ClaimManager extends ClaimHandler, ClaimEditor, ClaimPruner {
         getPlugin().runQueued(() -> getPlugin().getDatabase().getAllClaimWorlds().entrySet().stream()
                 .filter((world) -> world.getValue().removeClaimsBy(user))
                 .forEach((world) -> {
-                    if (getPlugin().getClaimWorld(world.getKey().world()).isPresent()) {
+                    if (getPlugin().getClaimWorld(world.getKey().world()).isPresent()
+                            && world.getKey().server().equals(getPlugin().getServerName())) {
                         getPlugin().getClaimWorlds().put(world.getKey().world().getName(), world.getValue());
                     }
                     getDatabase().updateClaimWorld(world.getValue());
@@ -263,7 +264,8 @@ public interface ClaimManager extends ClaimHandler, ClaimEditor, ClaimPruner {
         getPlugin().runQueued(() -> getPlugin().getDatabase().getAllClaimWorlds().entrySet().stream()
                 .filter((world) -> world.getValue().removeAdminClaims())
                 .forEach((world) -> {
-                    if (getPlugin().getClaimWorld(world.getKey().world()).isPresent()) {
+                    if (getPlugin().getClaimWorld(world.getKey().world()).isPresent()
+                            && world.getKey().server().equals(getPlugin().getServerName())) {
                         getPlugin().getClaimWorlds().put(world.getKey().world().getName(), world.getValue());
                     }
                     getDatabase().updateClaimWorld(world.getValue());
