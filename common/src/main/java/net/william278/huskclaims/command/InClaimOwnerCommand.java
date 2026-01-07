@@ -61,8 +61,8 @@ public abstract class InClaimOwnerCommand extends InClaimCommand {
         }
 
         // Handle parent claims
-        if (isAdminEditable || !otherPermission && !claim.isPrivilegeAllowed(
-                TrustLevel.Privilege.MANAGE_CHILD_CLAIMS, executor, plugin)) {
+        if (isAdminEditable || !otherPermission && !claim.getOwner().map(
+                uuid -> uuid.equals(executor.getUuid())).orElse(false)) {
             plugin.getLocales().getLocale(noPrivilegeMessage)
                     .ifPresent(executor::sendMessage);
             return;
